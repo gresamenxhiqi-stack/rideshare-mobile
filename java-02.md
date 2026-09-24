@@ -1,10 +1,4 @@
-# RideShare — Java 2
 
-**Shkurtesat:** MVP (Minimum Viable Product – produkti minimal i përdorshëm); AI (Artificial Intelligence – inteligjencë artificiale).
-
-## 1. Log in
-Sign up for free
-You said:
 
 # RideShare — Java 2
 
