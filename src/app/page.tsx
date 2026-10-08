@@ -1,7 +1,21 @@
 import { KartaUdhetimi } from "@/components/KartaUdhetimi";
-import { udhetimet } from "@/lib/udhetimet";
+import { lexoUdhetimet, type Udhetim } from "@/lib/udhetimet";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  let udhetimet: Udhetim[];
+  try {
+    udhetimet = await lexoUdhetimet();
+  } catch {
+    return (
+      <main className="page-shell">
+        <h1>RideShare</h1>
+        <p role="alert">Nuk u lidhëm me databazën. Provo përsëri.</p>
+        <a className="action action--primary" href="/">Provo përsëri</a>
+      </main>
+    );
+  }
   return (
     <main className="page-shell">
       <header className="hero">
@@ -19,11 +33,13 @@ export default function Home() {
           </div>
           <span className="trip-total">{udhetimet.length} udhëtime</span>
         </div>
-        <div className="trip-list">
+        {udhetimet.length === 0 ? (
+          <p>Nuk ka udhëtime për momentin.</p>
+        ) : <div className="trip-list">
           {udhetimet.map((udhetim) => (
             <KartaUdhetimi key={udhetim.id} udhetim={udhetim} />
           ))}
-        </div>
+        </div>}
       </section>
       <footer className="page-footer">Prototip mësimor · Nuk kryhen rezervime reale</footer>
     </main>
