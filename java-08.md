@@ -62,6 +62,34 @@ e re; vetëm hapësirat nuk aktivizojnë konfirmimin.
 
 **Vëzhgimi:** Plotëso rezultatin real: `________________`.
 
+## Prova me një hyrje të re
+
+**Hyrja që provova:** Në faqen `/java-08-test` shkrova `Biblioteka` në
+fushën “Shkruaj vendtakimin” dhe shtypa “Konfirmo në telefon”. Më pas
+ndryshova fushën në `Parkingu`, por nuk shtypa përsëri konfirmimin. Në fund
+provova edhe një vlerë që përmban vetëm hapësira.
+
+**Parashikimi im para klikimit:** Pas konfirmimit duhet të shfaqet
+“Vendtakimi i konfirmuar” me vlerën `Biblioteka`. Ndryshimi në `Parkingu` nuk
+duhet ta ndryshojë zgjedhjen derisa të shtypet përsëri konfirmimi. Për vetëm
+hapësira, butoni duhet të mbetet i çaktivizuar.
+
+**Çfarë pashë realisht:** U shfaq “Vendtakimi i konfirmuar” dhe `Biblioteka`.
+Kur shkrova `Parkingu` pa konfirmuar, `Biblioteka` mbeti zgjedhja e
+konfirmuar. Kur fusha përmbante vetëm hapësira, butoni i konfirmimit ishte i
+çaktivizuar. Kjo provë u krye në faqen lokale me të dhëna fiktive; nuk u
+ruajt dhe nuk u dërgua asnjë vendndodhje.
+
+**Skedari dhe funksioni që e shpjegojnë:** `src/components/Vendtakimi.tsx`;
+funksionet `confirmPlace` dhe `useDeviceLocation`. `confirmPlace` përdor
+`trim()` për të refuzuar boshllëqet dhe e ndryshon `confirmedPlace` vetëm pas
+klikimit.
+
+**Çfarë kuptova ose korrigjova:** Teksti që përdoruesi po shkruan dhe
+vendtakimi i konfirmuar janë dy vlera të ndara. Korrigjimi siguron që vetëm
+një klikim i qëllimshëm e ndryshon zgjedhjen dhe që hyrja bosh nuk
+konfirmohet.
+
 ## Privatësia
 
 Provat përdorin të dhëna fiktive. Koordinatat nuk shfaqen, nuk ruhen në
