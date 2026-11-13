@@ -1,42 +1,44 @@
-# Java 9 · Udhëtimet e preferuara
+﻿# RideShare — Java 9
 
-## Çfarë u ndërtua
+## Çfarë ndërtova
 
-- Përdoruesi i kyçur ruan një udhëtim nga faqja e detajeve.
-- Ylli dhe numri përditësohen menjëherë; gjatë kërkesës butoni bllokohet.
-- Në dështim pamja kthehet te vlerat e mëparshme dhe shfaqet mundësia për riprovim.
-- Preferimet ruhen në Neon për çiftin përdorues–udhëtim. Çelësi primar e bën
-  shkrimin të përsëritshëm pa krijuar rreshta dublikatë.
-- Veprimi nuk dërgon kërkesë rezervimi dhe nuk ndryshon numrin e vendeve.
+Shtova ruajtjen e udhëtimeve të preferuara për përdoruesit e kyçur. Nga faqja e detajeve, përdoruesi mund të ruajë një udhëtim. Ndërfaqja përditëson yllin dhe numrin menjëherë, bllokon butonin gjatë kërkesës dhe i rikthen vlerat e mëparshme nëse serveri nuk e konfirmon ruajtjen. Preferimi ruhet në Neon për çiftin përdorues–udhëtim; çelësi primar dhe `ON CONFLICT DO NOTHING` parandalojnë rreshtat e dyfishtë. Kjo veçori nuk krijon rezervim dhe nuk ndryshon numrin e vendeve.
 
-## Skedarët
+## Provat që bëra
 
-- `src/components/FavoritiUdhetimi.tsx` — ndërfaqja optimiste dhe rikthimi në gabim.
-- `src/app/api/udhetimet/[id]/preferim/route.ts` — verifikimi i hyrjes dhe shkrimi.
-- `src/lib/preferimet.ts` — leximi i gjendjes së preferimit.
-- `src/app/udhetimi/[id]/page.tsx` — gjendja fillestare nga serveri.
-- `schema-java09.sql` — skema e tabelës dhe kufizimi unik.
+Nuk munda të kryej prova manuale në aplikacion: në këtë kopje mungon `.env.local`, prandaj nuk ka konfigurim të verifikueshëm për hyrjen GitHub dhe Neon. Më poshtë shënoj veçmas sjelljen që kontrollova në kod; këto nuk janë rezultate të ekzekutimit në shfletues ose databazë.
 
-## Provat
+### Prova 1: Ruajtja e suksesshme mbetet pas rifreskimit.
 
-Ekzekutoji me hyrje aktive dhe pas aplikimit të `schema-java09.sql`:
+**Statusi:** Nuk u ekzekutua manualisht.
 
-1. **Ruajtje dhe rifreskim:** ruaj një udhëtim dhe rifresko faqen.
-   Rezultati: yll i mbushur, numër i qëndrueshëm, një rresht në `preferimet`.
-   **Rezultati real:** për t'u plotësuar pas provës në Neon.
-2. **Gabim dhe riprovim:** vendos përkohësisht
-   `JAVA09_FORCE_FAVORITE_FAILURE=true`, provo ruajtjen, pastaj çaktivizoje dhe
-   provo sërish. Rezultati: pas gabimit ylli dhe numri rikthehen; pas riprovimit
-   preferimi ruhet. **Rezultati real:** për t'u plotësuar.
-3. **Përsëritje:** kliko disa herë gjatë pritjes; butoni pranon vetëm kërkesën e
-   parë ndërsa pret. Pas suksesit, kliko **Ruaj përsëri** për të dërguar sërish
-   të njëjtin synim. Rezultati: vetëm një rresht për çiftin përdorues–udhëtim.
-   **Rezultati real:** për t'u plotësuar.
+**Kontrolli në kod:** Faqja lexon gjendjen fillestare me `gjendjaPreferimit`; API-ja bën `INSERT` në `preferimet`, ndërsa skema vendos çelës primar mbi `github_id` dhe `udhetim_id`. Kjo është rrjedha e implementuar për ruajtje dhe rifreskim, por nuk verifikova një rresht real në Neon.
 
-## Kufizimet dhe ndihma
+### Prova 2: Gabimi i serverit nuk lë një sukses të rremë në ekran.
 
-- Heqja e preferimit nuk është përfshirë; është zgjerim opsional.
-- Provat manuale të mësipërme nuk pretendohen të jenë ekzekutuar. Plotëso
-  rezultatet reale para dorëzimit.
-- U përdor ndihma e AI për zbatimin dhe kontrollin teknik; provat në Neon dhe
-  konfirmimi i sjelljes duhet të bëhen nga studenti.
+**Statusi:** Nuk u ekzekutua manualisht.
+
+**Kontrolli në kod:** Kur `JAVA09_FORCE_FAVORITE_FAILURE=true`, API-ja kthen HTTP 503. Komponenti e trajton përgjigjen jo të suksesshme duke rikthyer gjendjen dhe numrin e mëparshëm dhe shfaq mesazhin për riprovim. Nuk e aktivizova këtë konfigurim dhe nuk vëzhgova sjelljen në shfletues.
+
+### Prova 3: Klikimet e përsëritura nuk krijojnë kopje.
+
+**Statusi:** Nuk u ekzekutua manualisht.
+
+**Kontrolli në kod:** Komponenti bllokon klikimet gjatë kërkesës; databaza ka çelës primar për çiftin përdorues–udhëtim, dhe API-ja përdor `ON CONFLICT DO NOTHING`. Kjo parandalon dublikimin në implementim, por nuk numërova rreshta realë pas klikimeve në aplikacion.
+
+## Ku gjendet puna
+
+- `src/components/FavoritiUdhetimi.tsx` — gjendja optimiste, bllokimi gjatë kërkesës dhe rikthimi në gabim.
+- `src/app/api/udhetimet/[id]/preferim/route.ts` — kontrolli i hyrjes, ruajtja dhe përgjigjja e simuluar HTTP 503.
+- `src/lib/preferimet.ts` — leximi i gjendjes së preferimit dhe numrit.
+- `src/app/udhetimi/[id]/page.tsx` — shfaqja e gjendjes fillestare në detaje.
+- `schema-java09.sql` — tabela `preferimet` dhe çelësi primar kundër dublikimeve.
+- Demonstrim publik: nuk kam konfirmuar një adresë të publikuar.
+
+## Çfarë mbetet për përmirësim
+
+Duhet të konfigurohen kredencialet e hyrjes dhe lidhja me Neon, të ekzekutohet `schema-java09.sql`, pastaj të bëhen tri provat manuale dhe të regjistrohen rezultatet reale. Aktualisht përdoruesi mund të ruajë një preferim, por nuk mund ta heqë; heqja mund të jetë zgjerim i ardhshëm.
+
+## Ndihma nga AI (Artificial Intelligence – inteligjencë artificiale)
+
+Përdora AI për të shqyrtuar modelin e raportit dhe implementimin ekzistues, si dhe për të plotësuar këtë dokument. Verifikova pohimet duke lexuar komponentin, API-në, funksionin e leximit dhe skemën. Nuk i paraqita si të kryera provat manuale që kërkojnë hyrje dhe databazë.
